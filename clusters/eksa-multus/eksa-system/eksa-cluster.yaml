@@ -1,0 +1,139 @@
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: Cluster
+metadata:
+  creationTimestamp: null
+  name: eksa-multus
+spec:
+  clusterNetwork:
+    cni: cilium
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+    services:
+      cidrBlocks:
+      - 10.96.0.0/12
+  controlPlaneConfiguration:
+    count: 2
+    endpoint:
+      host: 198.18.99.35
+    machineGroupRef:
+      kind: VSphereMachineConfig
+      name: eksa-multus-cp
+  datacenterRef:
+    kind: VSphereDatacenterConfig
+    name: eksa-multus
+  externalEtcdConfiguration:
+    count: 3
+    machineGroupRef:
+      kind: VSphereMachineConfig
+      name: eksa-multus-etcd
+  gitOpsRef:
+    kind: GitOpsConfig
+    name: eksa-multus-gitops
+  kubernetesVersion: "1.20"
+  workerNodeGroupConfigurations:
+  - count: 2
+    machineGroupRef:
+      kind: VSphereMachineConfig
+      name: eksa-multus
+status: {}
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereDatacenterConfig
+metadata:
+  creationTimestamp: null
+  name: eksa-multus
+spec:
+  datacenter: SDDC-Datacenter
+  insecure: false
+  network: /SDDC-Datacenter/network/sddc-cgw-network-1
+  server: vcenter.sddc-44-239-186-141.vmwarevmc.com
+  thumbprint: ""
+status: {}
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereMachineConfig
+metadata:
+  annotations:
+    anywhere.eks.amazonaws.com/control-plane: "true"
+  creationTimestamp: null
+  name: eksa-multus-cp
+spec:
+  datastore: /SDDC-Datacenter/datastore/WorkloadDatastore
+  diskGiB: 25
+  folder: /SDDC-Datacenter/vm/capv/eksa-multus
+  memoryMiB: 8192
+  numCPUs: 2
+  osFamily: ubuntu
+  resourcePool: /SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool
+  template: /SDDC-Datacenter/vm/Templates/ubuntu-v1.20.7-kubernetes-1-20-eks-7-amd64-bdc54be
+  users:
+  - name: ec2-user
+    sshAuthorizedKeys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDV8y9Bv6jfiTSohorcYh0EzYYO/dRRQZHqB13JdAEV30NOqSONNVsj6ZoPo3eOKHao98zFhCA4zE+qGAB+g1GSKPdFcR3W4sBQ6tHIi5VwUzhAUAYIHpC2peF6iYLTCuPKJQE3Qr0aied6jtV2INrlLBC++lOrj0vRuvi53rNvefRPB1wHbd5XN1LBz9KJnaOL+Suy3DYwQS6DvB+3FFLCg6aWY65ABiDAiO6Go0IUbkzkUsEGtonwu8UejDWE/+1ogATT2+O2AgHS6InjPfRGtuROOMruvUgwk1yzFJJenI4HOdlepOyXMdiZ8VP3H21LYxOg3j9N9EsHf2se3Ix0WD7a12K2wCRl9AnIWbQdCrU/a6YXjcCgSL2zCT0JUC35zdXWyRbJn/UEWmbKW+U3b0A+eJtfWR5g/x6HKNzFZKQUBS8NY/HjrjdItyklPAJYmQ9kz6JimJzLzSvDMRgNUrJBw/UeX6l1M3pDgqGYND1fxufoAvMb861WPR5I3LE=
+status: {}
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereMachineConfig
+metadata:
+  creationTimestamp: null
+  name: eksa-multus
+spec:
+  datastore: /SDDC-Datacenter/datastore/WorkloadDatastore
+  diskGiB: 25
+  folder: /SDDC-Datacenter/vm/capv/eksa-multus
+  memoryMiB: 8192
+  numCPUs: 2
+  osFamily: ubuntu
+  resourcePool: /SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool
+  template: /SDDC-Datacenter/vm/Templates/ubuntu-v1.20.7-kubernetes-1-20-eks-7-amd64-bdc54be
+  users:
+  - name: ec2-user
+    sshAuthorizedKeys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDV8y9Bv6jfiTSohorcYh0EzYYO/dRRQZHqB13JdAEV30NOqSONNVsj6ZoPo3eOKHao98zFhCA4zE+qGAB+g1GSKPdFcR3W4sBQ6tHIi5VwUzhAUAYIHpC2peF6iYLTCuPKJQE3Qr0aied6jtV2INrlLBC++lOrj0vRuvi53rNvefRPB1wHbd5XN1LBz9KJnaOL+Suy3DYwQS6DvB+3FFLCg6aWY65ABiDAiO6Go0IUbkzkUsEGtonwu8UejDWE/+1ogATT2+O2AgHS6InjPfRGtuROOMruvUgwk1yzFJJenI4HOdlepOyXMdiZ8VP3H21LYxOg3j9N9EsHf2se3Ix0WD7a12K2wCRl9AnIWbQdCrU/a6YXjcCgSL2zCT0JUC35zdXWyRbJn/UEWmbKW+U3b0A+eJtfWR5g/x6HKNzFZKQUBS8NY/HjrjdItyklPAJYmQ9kz6JimJzLzSvDMRgNUrJBw/UeX6l1M3pDgqGYND1fxufoAvMb861WPR5I3LE=
+status: {}
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: VSphereMachineConfig
+metadata:
+  annotations:
+    anywhere.eks.amazonaws.com/etcd: "true"
+  creationTimestamp: null
+  name: eksa-multus-etcd
+spec:
+  datastore: /SDDC-Datacenter/datastore/WorkloadDatastore
+  diskGiB: 25
+  folder: /SDDC-Datacenter/vm/capv/eksa-multus
+  memoryMiB: 8192
+  numCPUs: 2
+  osFamily: ubuntu
+  resourcePool: /SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool
+  template: /SDDC-Datacenter/vm/Templates/ubuntu-v1.20.7-kubernetes-1-20-eks-7-amd64-bdc54be
+  users:
+  - name: ec2-user
+    sshAuthorizedKeys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDV8y9Bv6jfiTSohorcYh0EzYYO/dRRQZHqB13JdAEV30NOqSONNVsj6ZoPo3eOKHao98zFhCA4zE+qGAB+g1GSKPdFcR3W4sBQ6tHIi5VwUzhAUAYIHpC2peF6iYLTCuPKJQE3Qr0aied6jtV2INrlLBC++lOrj0vRuvi53rNvefRPB1wHbd5XN1LBz9KJnaOL+Suy3DYwQS6DvB+3FFLCg6aWY65ABiDAiO6Go0IUbkzkUsEGtonwu8UejDWE/+1ogATT2+O2AgHS6InjPfRGtuROOMruvUgwk1yzFJJenI4HOdlepOyXMdiZ8VP3H21LYxOg3j9N9EsHf2se3Ix0WD7a12K2wCRl9AnIWbQdCrU/a6YXjcCgSL2zCT0JUC35zdXWyRbJn/UEWmbKW+U3b0A+eJtfWR5g/x6HKNzFZKQUBS8NY/HjrjdItyklPAJYmQ9kz6JimJzLzSvDMRgNUrJBw/UeX6l1M3pDgqGYND1fxufoAvMb861WPR5I3LE=
+status: {}
+
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: GitOpsConfig
+metadata:
+  creationTimestamp: null
+  name: eksa-multus-gitops
+spec:
+  flux:
+    github:
+      branch: main
+      clusterConfigPath: clusters/eksa-multus
+      fluxSystemNamespace: flux-system
+      owner: sheetaljoshi
+      personal: true
+      repository: eks-anywhere-vsphere-gitops
+status: {}
+
+---
